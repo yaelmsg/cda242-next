@@ -17,5 +17,5 @@ jobs:
           ls ${{ github.workspace }}
       - name: Build
         run: |
-          rpn run build
+          npm run build
       - run: echo "🍏 This job's status is ${{ job.status }}."
