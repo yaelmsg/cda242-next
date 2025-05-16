@@ -1,14 +1,30 @@
 on: [push]
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - run: npm clean-install
       - run: npm run build
+      - name: Save cache (node_modules)
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            node_modules
+            /home/runner/.cache/Cypress
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/package-lock.json') }}
+
   test:
-    runs-on: ubuntu-test
+    runs-on: ubuntu-latest
+    needs:
+      - build
     steps:
       - uses: actions/checkout@v4
-      - run: npm clean-install
+      - name: Restore cache (node_modules)
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+            /home/runner/.cache/Cypress
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/package-lock.json') }}
       - run: npm run e2e:headless
